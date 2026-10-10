@@ -1,3 +1,34 @@
+// SPDX-License-Identifier: Apache-2.0
+
+soong_config_string_variable {
+    name: "display_core_abi_profile",
+    values: ["sdm_abi_v2"],
+}
+
+soong_config_module_type {
+    name: "lenovo_display_abi_genrule",
+    module_type: "genrule",
+    config_namespace: "lenovo_display",
+    variables: ["display_core_abi_profile"],
+    properties: ["cmd"],
+}
+
+// The generated header is the single ABI selection for every SDM consumer.
+lenovo_display_abi_genrule {
+    name: "display_core_abi_config",
+    out: ["display_core_abi_config.h"],
+    soong_config_variables: {
+        display_core_abi_profile: {
+            sdm_abi_v2: {
+                cmd: "printf '// SPDX-License-Identifier: Apache-2.0\n#pragma once\n#define DISPLAY_CORE_ABI_V2 1\n' > $(out)",
+            },
+            conditions_default: {
+                cmd: "printf '// SPDX-License-Identifier: Apache-2.0\n#pragma once\n#define DISPLAY_CORE_ABI_V2 0\n' > $(out)",
+            },
+        },
+    },
+}
+
 cc_library_headers {
     name: "display_debug_headers",
     vendor: true,
@@ -8,6 +39,8 @@ cc_library_headers {
 
 cc_library_headers {
   name: "display_core_headers",
+  generated_headers: ["display_core_abi_config"],
+  export_generated_headers: ["display_core_abi_config"],
   vendor: true,
   export_include_dirs: [
     "include",

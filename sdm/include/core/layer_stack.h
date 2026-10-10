@@ -37,6 +37,8 @@
 #ifndef __LAYER_STACK_H__
 #define __LAYER_STACK_H__
 
+#include <display_core_abi_config.h>
+
 #include <stdint.h>
 #include <utils/constants.h>
 #include <utils/fence.h>
@@ -533,8 +535,16 @@ struct Layer {
   uint32_t demura_decimate_h = 1;                  //!< If demura layer, stores the decimation
                                                    //!< along height.
 
+#if DISPLAY_CORE_ABI_V2
+  std::vector<PrivacyRegion> privacy_regions = {}; //!< Privacy regions of the layer
+#else
   static inline std::vector<PrivacyRegion> privacy_regions = {}; //!< Privacy regions of the layer
+#endif
+#if DISPLAY_CORE_ABI_V2
+  CornerRadius corner_radius = {};                 //!< Corner radius of the layer
+#else
   static inline CornerRadius corner_radius = {};                 //!< Corner radius of the layer
+#endif
 };
 
 /*! @brief This structure defines the color space + transfer of a given layer.

@@ -3119,6 +3119,9 @@ bool SDMDisplay::IsModeSwitchAllowed(uint32_t config) {
   DisplayError error = kErrorNone;
   uint32_t allowed_mode_switch = 0;
   uint32_t checking_config = config;
+#if DISPLAY_CORE_ABI_V2
+  int bits_per_word = sizeof(uint32_t) * 8;
+#endif
 
   if (variable_config_map_.find(config) == variable_config_map_.end()) {
     DLOGE("Invalid config: %d", config);
@@ -3136,18 +3139,34 @@ bool SDMDisplay::IsModeSwitchAllowed(uint32_t config) {
     }
   }
 
+#if DISPLAY_CORE_ABI_V2
+  /* Allowed mode switch is used as both:
+   * - input: index into the allowed_mode_switch array
+   * - output: value retrieved from this specified index
+   */
+  allowed_mode_switch = checking_config / bits_per_word;
+#endif
   error = display_intf_->IsSupportedOnDisplay(kSupportedModeSwitch,
                                               &allowed_mode_switch);
   if (error != kErrorNone) {
+#if !DISPLAY_CORE_ABI_V2
     if (error == kErrorResources) {
       DLOGW("Not allowed to switch to mode:%d", config);
       return false;
     }
+#endif
     DLOGW("Unable to retrieve supported modes for the current device "
           "configuration.");
+#if DISPLAY_CORE_ABI_V2
+    return false;
+#endif
   }
 
+#if DISPLAY_CORE_ABI_V2
+  if (allowed_mode_switch & (1 << (checking_config % bits_per_word))) {
+#else
   if (allowed_mode_switch == 0 || (allowed_mode_switch & (1 << checking_config))) {
+#endif
     DLOGV_IF(kTagClient, "Allowed to switch to mode:%d", config);
     return true;
   }
@@ -3400,9 +3419,26 @@ bool SDMDisplay::IsSameGroup(Config config_id1, Config config_id2) {
   const DisplayConfigGroupInfo &config_group1 = config_info1;
   const DisplayConfigGroupInfo &config_group2 = config_info2;
 
+#if DISPLAY_CORE_ABI_V2
+  constexpr uint32_t bits_per_word = sizeof(uint32_t) * 8;
+  const uint32_t config1_allowed_index = config_id2 / bits_per_word;
+  const uint32_t config2_allowed_index = config_id1 / bits_per_word;
+  if (config1_allowed_index >= config_group1.allowed_mode_switch.size() ||
+      config2_allowed_index >= config_group2.allowed_mode_switch.size()) {
+    return false;
+  }
+  const uint32_t config1_allowed = config_group1.allowed_mode_switch[config1_allowed_index];
+  const uint32_t config2_allowed = config_group2.allowed_mode_switch[config2_allowed_index];
+
+#endif
   return ((config_group1 == config_group2) &&
+#if DISPLAY_CORE_ABI_V2
+          (config1_allowed & (uint32_t{1} << (config_id2 % bits_per_word))) &&
+          (config2_allowed & (uint32_t{1} << (config_id1 % bits_per_word))));
+#else
           (config_group1.allowed_mode_switch & (1 << (INT32(config_id2)))) &&
           (config_group2.allowed_mode_switch & (1 << (INT32(config_id1)))));
+#endif
 }
 
 bool SDMDisplay::AllowSeamless(Config config) {

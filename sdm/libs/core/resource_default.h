@@ -135,7 +135,9 @@ class ResourceDefault : public ResourceInterface {
     return kErrorNone;
   }
   virtual bool IsGPUHWAvailable() { return true; }
+#if DISPLAY_CORE_ABI_V2
   virtual DisplayError CanTakeDPUScreenshot(uint32_t display_id) { return kErrorNone; };
+#endif
 
  private:
   enum PipeOwner {

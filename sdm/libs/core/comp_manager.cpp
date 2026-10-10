@@ -1210,10 +1210,16 @@ bool CompManager::IsGPUHWAvailable() {
 }
 
 DisplayError CompManager::CanTakeDPUScreenshot(Handle display_ctx) {
+#if DISPLAY_CORE_ABI_V2
   std::lock_guard<std::recursive_mutex> obj(comp_mgr_mutex_);
   DisplayCompositionContext *display_comp_ctx =
       reinterpret_cast<DisplayCompositionContext *>(display_ctx);
 
   return resource_intf_->CanTakeDPUScreenshot(display_comp_ctx->display_id.GetDisplayId());
+#else
+  // The baldur profile has no screenshot preflight slot. CaptureCwb performs capture validation;
+  // ConcurrencyMgr rejects composer readback while a virtual display is active.
+  return kErrorNone;
+#endif
 }
 }  // namespace sdm

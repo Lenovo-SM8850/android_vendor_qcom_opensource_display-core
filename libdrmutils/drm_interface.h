@@ -36,6 +36,8 @@
 #ifndef __DRM_INTERFACE_H__
 #define __DRM_INTERFACE_H__
 
+#include <display_core_abi_config.h>
+
 #ifndef TARGET_INCLUDES_NEO
 #include <display/drm/msm_drm_aiqe.h>
 #endif
@@ -1068,7 +1070,9 @@ struct DRMModeInfo {
   uint32_t transfer_time_us;
   uint32_t transfer_time_us_min;
   uint32_t transfer_time_us_max;
+#if !DISPLAY_CORE_ABI_V2
   uint32_t allowed_mode_switch;
+#endif
   uint32_t cur_panel_mode;
   uint32_t has_cwb_crop;
   uint32_t has_dedicated_cwb;
@@ -1078,6 +1082,9 @@ struct DRMModeInfo {
   uint32_t curr_compression_mode;
   DynamicFrontPorchType fp_type = UNKNOWN;
   std::vector<uint32_t> dyn_fp_list;
+#if DISPLAY_CORE_ABI_V2
+  std::vector<uint32_t> allowed_mode_switch;
+#endif
   std::vector<DRMSubModeInfo> sub_modes;
   uint32_t qsync_min_fps;
   uint32_t curr_bpp_mode;

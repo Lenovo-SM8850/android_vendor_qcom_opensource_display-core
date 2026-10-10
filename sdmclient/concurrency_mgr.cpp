@@ -1652,6 +1652,14 @@ ConcurrencyMgr::SetReadbackBuffer(uint64_t display, void *buffer,
     return kErrorParameters;
   }
 
+#if !DISPLAY_CORE_ABI_V2
+  // Preserve baldur's stock readback restriction without its missing resource preflight.
+  int virtual_dpy_index = disp_->GetDisplayIndex(qdutilsDisplayType::DISPLAY_VIRTUAL);
+  if ((virtual_dpy_index != -1) && sdm_display_[virtual_dpy_index]) {
+    return kErrorNotSupported;
+  }
+#endif
+
   CwbConfig cwb_config = {}; /* SF uses LM tappoint*/
 
   return CallDisplayFunction(display, &SDMDisplay::SetReadbackBuffer, buffer,
