@@ -1652,6 +1652,14 @@ ConcurrencyMgr::SetReadbackBuffer(uint64_t display, void *buffer,
     return kErrorParameters;
   }
 
+#if !DISPLAY_CORE_ABI_V2
+  // Reject readback during virtual display use when resource preflight is unavailable.
+  int virtual_dpy_index = disp_->GetDisplayIndex(qdutilsDisplayType::DISPLAY_VIRTUAL);
+  if ((virtual_dpy_index != -1) && sdm_display_[virtual_dpy_index]) {
+    return kErrorNotSupported;
+  }
+#endif
+
   CwbConfig cwb_config = {}; /* SF uses LM tappoint*/
 
   return CallDisplayFunction(display, &SDMDisplay::SetReadbackBuffer, buffer,

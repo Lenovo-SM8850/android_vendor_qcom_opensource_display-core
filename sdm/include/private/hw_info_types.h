@@ -31,6 +31,8 @@
 #ifndef __HW_INFO_TYPES_H__
 #define __HW_INFO_TYPES_H__
 
+#include <display_core_abi_config.h>
+
 #include <stdint.h>
 #include <core/display_interface.h>
 #include <core/core_interface.h>
@@ -568,7 +570,11 @@ struct HWPanelInfo {
   uint32_t transfer_time_us = 0;      // transfer time in micro seconds to panel's active region
   uint32_t transfer_time_us_min = 0;  // min transfer time in micro seconds to panel's active region
   uint32_t transfer_time_us_max = 0;  // max transfer time in micro seconds to panel's active region
+#if DISPLAY_CORE_ABI_V2
+  std::vector<uint32_t> allowed_mode_switch;   // Bit i represents switch to mode i allowed or not
+#else
   uint32_t allowed_mode_switch = 0;   // Allowed mode switch bit mask
+#endif
   uint32_t panel_mode_caps = 0;       // Video/Command mode capability bit mask
   bool qsync_support = false;         // Specifies panel supports qsync feature or not.
   bool dyn_bitclk_support = false;    // Bit clk can be updated to avoid RF interference.
@@ -1166,7 +1172,11 @@ struct HWLayersInfo {
   HWDNSCInfo dnsc_cfg = {};
   SelfRefreshState self_refresh_state = kSelfRefreshNone;
   BufferInfo dummy_loopback_cac_info = {};
+#if DISPLAY_CORE_ABI_V2
+  std::vector<PrivacyRegion> privacy_regions_ = {};
+#else
   static inline std::vector<PrivacyRegion> privacy_regions_ = {};
+#endif
 };
 
 struct DispLayerStack {
