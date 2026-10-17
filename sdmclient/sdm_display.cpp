@@ -588,6 +588,7 @@ DisplayError SDMDisplay::Init() {
     return kErrorNotSupported;
   }
 
+  SDMDebugHandler::Get()->GetProperty(STC_DISABLE_HDR_MODES, &stc_disable_hdr_modes_);
   SDMDebugHandler::Get()->GetProperty(DISABLE_HDR, &disable_hdr_handling_);
   if (disable_hdr_handling_) {
     DLOGI("HDR Handling disabled");

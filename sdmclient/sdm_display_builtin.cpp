@@ -258,9 +258,10 @@ DisplayError SDMDisplayBuiltIn::PreValidateDisplay(bool *exit_validate) {
   // Checks and replaces layer stack for solid fill
   SolidFillPrepare();
 
+  // Keep HDR layer handling intact while optionally using only SDR STC modes.
+  bool stc_hdr_present = layer_stack_.flags.hdr_present && stc_disable_hdr_modes_ != 1;
   // Apply current Color Mode and Render Intent.
-  if (color_mode_->ApplyCurrentColorModeWithRenderIntent(
-          static_cast<bool>(layer_stack_.flags.hdr_present)) != kErrorNone) {
+  if (color_mode_->ApplyCurrentColorModeWithRenderIntent(stc_hdr_present) != kErrorNone) {
     // Fallback to GPU Composition, if Color Mode can't be applied.
     MarkLayersForClientComposition();
   }

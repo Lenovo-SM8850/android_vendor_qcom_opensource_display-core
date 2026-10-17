@@ -658,6 +658,7 @@ public:
   SDMColorModeMgr *color_mode_ = NULL;
   uint32_t num_configs_ = 0;
   int disable_hdr_handling_ = 0;  // disables HDR handling.
+  int stc_disable_hdr_modes_ = 0;  // Keeps STC in SDR modes for HDR content.
   int disable_sdr_histogram_ = 0; // disables handling of SDR histogram data.
   bool pending_commit_ = false;
   bool is_cmd_mode_ = false;
