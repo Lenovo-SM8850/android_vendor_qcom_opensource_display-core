@@ -100,6 +100,7 @@
 #define DISABLE_HDR_LUT_GEN                  DISPLAY_PROP("disable_hdr_lut_gen")
 #define DISABLE_HDR                          DISPLAY_PROP("hwc_disable_hdr")
 #define STC_DISABLE_HDR_MODES                DISPLAY_PROP("stc_disable_hdr_modes")
+#define HDR_CLIENT_COMPOSITION               DISPLAY_PROP("hdr_client_composition")
 #define QDCM_PCC_TRANS_PROP                  DISPLAY_PROP("qdcm.pcc_for_trans")
 #define QDCM_DIAGONAL_MATRIXMODE_PROP        DISPLAY_PROP("qdcm.diagonal_matrix_mode")
 #define QDCM_MODE_COMBINE_PROP               DISPLAY_PROP("qdcm.mode_combine")

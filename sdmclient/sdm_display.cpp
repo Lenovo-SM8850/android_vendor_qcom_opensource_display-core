@@ -589,6 +589,7 @@ DisplayError SDMDisplay::Init() {
   }
 
   SDMDebugHandler::Get()->GetProperty(STC_DISABLE_HDR_MODES, &stc_disable_hdr_modes_);
+  SDMDebugHandler::Get()->GetProperty(HDR_CLIENT_COMPOSITION, &hdr_client_composition_);
   SDMDebugHandler::Get()->GetProperty(DISABLE_HDR, &disable_hdr_handling_);
   if (disable_hdr_handling_) {
     DLOGI("HDR Handling disabled");
@@ -932,6 +933,10 @@ void SDMDisplay::BuildLayerStack() {
       // Dont honor HDR when its handling is disabled
       layer->input_buffer.flags.hdr = true;
       layer_stack_.flags.hdr_present = true;
+      // The panel tone-mapping LUT assumes peak luminance; let SurfaceFlinger map to the current one.
+      if (hdr_client_composition_ == 1) {
+        layer->flags.skip = true;
+      }
     }
 
     if (game_supported_ && (sdm_layer->GetType() == kLayerGame) && !hdr_layer) {
